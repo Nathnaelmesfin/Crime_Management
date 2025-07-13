@@ -1,0 +1,32 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.home, name='home'),
+    path('admin/', views.admin, name='admin'),
+    path('admin_login/', views.admin_login, name='admin_login'),
+    path('admin_logout/', views.admin_logout, name='admin_logout'),
+    path('about/', views.about, name='about'),
+    path('news/', views.news, name='news'),
+    path('services/', views.services, name='services'),
+    path('wanted_person/', views.wanted_person, name='wanted_person'),
+    path('missing/', views.missing, name='missing'),
+    path('contact/', views.contact, name='contact'),
+    path('register/', views.register, name='register'),
+    path('login/', views.login, name='login'),
+    path('Sendreport/', views.Sendreport, name='Sendreport'),
+    path('Reportadmin/', views.Reportadmin, name='Reportadmin'),
+    path('solve_report/<int:report_id>/', views.solve_report, name='solve_report'),
+    path('close_report/<int:report_id>/', views.close_report, name='close_report'),
+    path('Postnews/', views.Postnews, name='Postnews'),
+    path('delete_report/<int:report_id>/', views.delete_report, name='delete_report'),
+    path('Reportmissing/', views.Reportmissing, name='Reportmissing'),
+    path('missing/update_status/', views.update_missing_status, name='update_missing_status'),
+    path('Reportwanted/', views.Reportwanted, name='Reportwanted'),
+    path('Adminsettings/', views.Adminsettings, name='Adminsettings'),
+    path('missinggoods/', views.missinggoods, name='missinggoods'),
+    path('Reportmissinggoods/', views.Reportmissinggoods, name='Reportmissinggoods'),
+    path('notifications/mark_read/', views.mark_notifications_read, name='mark_notifications_read'),
+    path('notifications/', views.notifications_center, name='notifications_center'),
+    path('investigator_dashboard/', views.investigator_dashboard, name='investigator_dashboard'),
+]
