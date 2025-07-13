@@ -1,0 +1,124 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0B3D6E;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        .login-container {
+            background-color: #fff;
+            color: #000;
+            padding: 40px 30px;
+            border-radius: 20px;
+            max-width: 400px;
+            margin: 60px auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .login-title {
+            font-weight: bold;
+            font-size: 24px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .login-subtitle {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .form-control {
+            border-radius: 10px;
+        }
+        .btn-custom {
+            background-color: #0B3D6E;
+            color: #fff;
+            border-radius: 30px;
+            width: 100%;
+            padding: 10px;
+            font-weight: bold;
+        }
+        .btn-custom:hover {
+            background-color: #072c50;
+        }
+        .checkbox-label {
+            font-size: 13px;
+            color: #333;
+        }
+        .login-footer {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .login-footer a {
+            color: #0B3D6E;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .skip-link {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .skip-link a {
+            color: #999;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        .logo-round {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="text-center mt-4">
+        <img src="{% static 'img/logo.jpeg' %}" alt="Logo" class="logo-round">
+        <h4 class="mt-2"></h4>
+    </div>
+
+    <div class="login-container">
+        <div class="login-title">Login to Your Account</div>
+        <div class="login-subtitle">Thank you for making our society safer.</div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" action="{% url 'login' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="email" class="form-label">Email or Phone</label>
+                <input type="text" class="form-control" id="email" name="email" placeholder="Enter your email or phone" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+            </div>
+
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="terms">
+                <label class="form-check-label checkbox-label" for="terms">I accept the terms and conditions</label>
+            </div>
+
+            <button type="submit" class="btn btn-custom">Sign In</button>
+        </form>
+
+        <div class="login-footer">
+            New user? <a href="{% url 'register' %}">Register here</a>
+        </div>
+
+     
+
+</body>
+</html>

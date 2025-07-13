@@ -1,0 +1,341 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Report</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Favicon -->
+    <link href="{% static 'admin/img/favicon.ico' %}" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@500;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{% static 'admin/css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="{% static 'admin/css/style.css' %}" rel="stylesheet">
+</head>
+
+
+<body>
+    <div class="container-fluid position-relative d-flex p-0">
+        <!-- Spinner Start -->
+        <div id="spinner"
+            class="show bg-dark position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <!-- Spinner End -->
+
+
+        <!-- Sidebar Start -->
+        <div class="sidebar pe-4 pb-3">
+            <nav class="navbar bg-secondary navbar-dark">
+                <a href="{% url 'investigator_dashboard' %}" class="navbar-brand mx-4 mb-3">
+                    <h3 class="text-primary"><i class="fa fa-shield-alt me-2"></i>Office Panel</h3>
+                </a>
+                <div class="d-flex align-items-center ms-4 mb-4">
+                    <div class="ms-3">
+                        <h6 class="mb-0">{{ user.username }}</h6>
+                        <span>Investigating Officer</span>
+                    </div>
+                </div>
+                 <div class="navbar-nav w-100">
+                    <a href="{% url 'investigator_dashboard' %}" class="nav-item nav-link"><i
+                            class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+                    <a href="{% url 'Reportadmin' %}" class="nav-item nav-link active"><i class="fa fa-file-alt me-2"></i>Report</a>
+                    <a href="{% url 'Reportmissinggoods' %}" class="nav-item nav-link"><i class="fa fa-box-open me-2"></i>Missing Goods</a>
+                    <a href="{% url 'Reportwanted' %}" class="nav-item nav-link"><i class="fa fa-user-secret me-2"></i>Wanted Person</a>
+                </div>
+            </nav>
+        </div>
+        <!-- Sidebar End -->
+
+
+        <!-- Content Start -->
+        <div class="content">
+                 <!-- Navbar Start -->
+            <nav class="navbar navbar-expand bg-secondary navbar-dark sticky-top px-4 py-0">
+                <a href="index.html" class="navbar-brand d-flex d-lg-none me-4">
+                    <h2 class="text-primary mb-0"><i class="fa fa-shield-alt"></i></h2>
+                </a>
+                <a href="#" class="sidebar-toggler flex-shrink-0">
+                    <i class="fa fa-bars"></i>
+                </a>
+                <form class="d-none d-md-flex ms-4">
+                    <input class="form-control bg-dark border-0" type="search" placeholder="Search">
+                </form>
+                <div class="navbar-nav align-items-center ms-auto">
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <span class="d-none d-lg-inline-flex">Hello, {{ user.username }}</span>
+                        </a>
+                         <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0">
+                            <a href="{% url 'admin_logout' %}" class="dropdown-item">Log Out</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <!-- Navbar End -->
+
+            <!-- Blank Start -->
+            <div class="container-fluid pt-4 px-4">
+                <style>
+                    /* Hide scrollbars but keep scroll effect */
+                    .hide-scrollbar {
+                        scrollbar-width: none; /* Firefox */
+                        -ms-overflow-style: none;  /* IE and Edge */
+                        overflow-x: auto;
+                        overflow-y: auto;
+                        max-height: 80vh;
+                    }
+                    .hide-scrollbar::-webkit-scrollbar {
+                        display: none; /* Chrome, Safari, Opera */
+                    }
+                </style>
+                <div class="row vh-100 bg-secondary rounded align-items-start justify-content-center mx-0 hide-scrollbar">
+                    <div class="col-12">
+                        <br>
+                        <h3 class="text-center text-white mb-4">Submitted Reports</h3>
+                        <!-- Search Form for Active Reports -->
+                        <form method="get" class="row g-2 mb-3" autocomplete="off">
+                            <div class="col-md-2">
+                                <input type="text" name="active_case_id" class="form-control form-control-sm" placeholder="Case Id" value="{{ request.GET.active_case_id|default:'' }}">
+                            </div>
+                            <div class="col-md-2">
+                                <input type="text" name="active_name" class="form-control form-control-sm" placeholder="Name" value="{{ request.GET.active_name|default:'' }}">
+                            </div>
+                            <div class="col-md-2">
+                                <input type="text" name="active_email" class="form-control form-control-sm" placeholder="Email" value="{{ request.GET.active_email|default:'' }}">
+                            </div>
+                            <div class="col-md-2">
+                                <input type="date" name="active_date" class="form-control form-control-sm" value="{{ request.GET.active_date|default:'' }}">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary btn-sm w-100">Search</button>
+                            </div>
+                            <div class="col-md-2">
+                                <a href="?" class="btn btn-secondary btn-sm w-100">Reset</a>
+                            </div>
+                        </form>
+                        <div class="table-responsive">
+                            <table class="table table-dark table-striped table-bordered align-middle table-responsive-md"
+                                style="min-width: 1100px;">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40px; text-align: center;">#</th>
+                                        <th style="width: 80px;">Case Id</th>
+                                        <th style="max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Name</th>
+                                        <th style="max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Email</th>
+                                        <th style="width: 80px;">Type</th>
+                                        <th style="max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Description</th>
+                                        <th style="width: 110px; text-align: center;">File/Link</th>
+                                        <th style="width: 120px; white-space: nowrap;">Date</th>
+                                        <th style="width: 90px;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for report in reports %}
+                                    <tr>
+                                        <td style="width: 40px; text-align: center;">{{ forloop.counter }}</td>
+                                        <td style="width: 80px;">#C-{{ report.id }}</td>
+                                        <td style="max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{% if report.user %}{{ report.user.first_name }} {{ report.user.last_name }}{% else %}<span class="text-warning">Anonymous</span>{% endif %}</td>
+                                        <td style="max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{% if report.user %}{{ report.user.email }}{% else %}-{% endif %}</td>
+                                        <td style="width: 80px;">{{ report.get_report_type_display }}</td>
+                                        <td style="max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                            {% if report.description and report.description|length > 10 %}
+                                                {{ report.description|slice:":10" }}... <a href="#" class="text-info more-details-link" data-bs-toggle="modal" data-bs-target="#descModal{{ report.id }}">more</a>
+                                                <!-- Modal -->
+                                                <div class="modal fade" id="descModal{{ report.id }}" tabindex="-1" aria-labelledby="descModalLabel{{ report.id }}" aria-hidden="true">
+                                                  <div class="modal-dialog">
+                                                    <div class="modal-content bg-dark text-white">
+                                                      <div class="modal-header border-0">
+                                                        <h5 class="modal-title text-white" id="descModalLabel{{ report.id }}">Full Description</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                      </div>
+                                                      <div class="modal-body">
+                                                        {{ report.description }}
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                            {% else %}
+                                                {{ report.description|default:'-' }}
+                                            {% endif %}
+                                        </td>
+                                        <td style="width: 110px; text-align: center;">
+                                            {% if report.file %}
+                                                <a href="{{ report.file.url }}" target="_blank" class="btn btn-sm btn-success">View</a>
+                                                <a href="{{ report.file.url }}" download class="btn btn-sm btn-primary ms-1">↓</a>
+                                            {% elif report.link %}
+                                                <a href="{{ report.link }}" target="_blank" class="btn btn-sm btn-info">Link</a>
+                                            {% else %}-{% endif %}
+                                        </td>
+                                        <td style="width: 120px; white-space: nowrap;">{{ report.submitted_at|date:'Y-m-d h:i A' }}</td>
+                                        <td style="width: 90px;">
+                                            <form method="post" action="{% url 'solve_report' report.id %}" style="display:inline;">
+                                                {% csrf_token %}
+                                                <select name="status" class="form-select form-select-sm d-inline w-auto" style="min-width: 80px; padding: 2px 6px; font-size: 0.9em;" onchange="this.form.submit()">
+                                                    <option value="open" {% if report.status == 'open' %}selected{% endif %}>Open</option>
+                                                    <option value="investigating" {% if report.status == 'investigating' %}selected{% endif %}>Investigating</option>
+                                                    <option value="closed" {% if report.status == 'closed' %}selected{% endif %}>Closed</option>
+                                                </select>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="9" class="text-center">No reports submitted yet.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Archive Table -->
+                        <h3 class="text-center text-white mb-4 mt-5">Archive (Solved Cases)</h3>
+                        <!-- Search Form for Archived Reports -->
+                        <form method="get" class="row g-2 mb-3" autocomplete="off">
+                            <div class="col-md-2">
+                                <input type="text" name="archive_case_id" class="form-control form-control-sm" placeholder="Case Id" value="{{ request.GET.archive_case_id|default:'' }}">
+                            </div>
+                            <div class="col-md-2">
+                                <input type="text" name="archive_name" class="form-control form-control-sm" placeholder="Name" value="{{ request.GET.archive_name|default:'' }}">
+                            </div>
+                            <div class="col-md-2">
+                                <input type="text" name="archive_email" class="form-control form-control-sm" placeholder="Email" value="{{ request.GET.archive_email|default:'' }}">
+                            </div>
+                            <div class="col-md-2">
+                                <input type="date" name="archive_date" class="form-control form-control-sm" value="{{ request.GET.archive_date|default:'' }}">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary btn-sm w-100">Search</button>
+                            </div>
+                            <div class="col-md-2">
+                                <a href="?" class="btn btn-secondary btn-sm w-100">Reset</a>
+                            </div>
+                        </form>
+                        <div class="table-responsive">
+                            <table class="table table-dark table-striped table-bordered align-middle table-responsive-md" style="min-width: 1100px;">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Case Id</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Type</th>
+                                        <th>Description</th>
+                                        <th>File/Link</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for report in archived_reports %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>#C-{{ report.id }}</td>
+                                        <td>{% if report.user %}{{ report.user.first_name }} {{ report.user.last_name }}{% else %}<span class="text-warning">Anonymous</span>{% endif %}</td>
+                                        <td>{% if report.user %}{{ report.user.email }}{% else %}-{% endif %}</td>
+                                        <td>{{ report.get_report_type_display }}</td>
+                                        <td>
+                                            {% if report.description and report.description|length > 10 %}
+                                                {{ report.description|slice:":10" }}... <a href="#" class="text-info more-details-link" data-bs-toggle="modal" data-bs-target="#descModalArchive{{ report.id }}">more details</a>
+                                                <!-- Modal -->
+                                                <div class="modal fade" id="descModalArchive{{ report.id }}" tabindex="-1" aria-labelledby="descModalLabelArchive{{ report.id }}" aria-hidden="true">
+                                                  <div class="modal-dialog">
+                                                    <div class="modal-content bg-dark text-white">
+                                                      <div class="modal-header border-0">
+                                                        <h5 class="modal-title text-white" id="descModalLabelArchive{{ report.id }}">Full Description</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                      </div>
+                                                      <div class="modal-body">
+                                                        {{ report.description }}
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                            {% else %}
+                                                {{ report.description|default:'-' }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if report.file %}
+                                                <a href="{{ report.file.url }}" target="_blank" class="btn btn-sm btn-success">View</a>
+                                                <a href="{{ report.file.url }}" download class="btn btn-sm btn-primary ms-1">Download</a>
+                                            {% elif report.link %}
+                                                <a href="{{ report.link }}" target="_blank" class="btn btn-sm btn-info">View Link</a>
+                                            {% else %}-{% endif %}
+                                        </td>
+                                        <td>{{ report.submitted_at|date:'Y-m-d h:i A' }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="8" class="text-center">No archived (solved) reports yet.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Blank End -->
+
+
+            <!-- Footer Start -->
+            <div class="container-fluid pt-4 px-4">
+                <div class="bg-secondary rounded-top p-4">
+                    <div class="row">
+                        <div class="col-12 col-sm-6 text-center text-sm-start">
+                            &copy; <a href="#">Your Site Name</a>, All Right Reserved.
+                        </div>
+                        <div class="col-12 col-sm-6 text-center text-sm-end">
+                            <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
+                            Designed By <a href="https://htmlcodex.com">HTML Codex</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Footer End -->
+        </div>
+        <!-- Content End -->
+
+
+        <!-- Back to Top -->
+        <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'admin/lib/chart/chart.min.js' %}"></script>
+    <script src="{% static 'admin/lib/easing/easing.min.js' %}"></script>
+    <script src="{% static 'admin/lib/waypoints/waypoints.min.js' %}"></script>
+    <script src="{% static 'admin/lib/owlcarousel/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'admin/lib/tempusdominus/js/moment.min.js' %}"></script>
+    <script src="{% static 'admin/lib/tempusdominus/js/moment-timezone.min.js' %}"></script>
+    <script src="{% static 'admin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+
+    <!-- Template Javascript -->
+    <script src="{% static 'admin/js/main.js' %}"></script>
+</body>
+
+</html>

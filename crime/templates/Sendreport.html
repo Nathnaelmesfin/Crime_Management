@@ -1,0 +1,379 @@
+{% extends 'base.html' %}
+{% block title %}Home | Ayer Tena Police Station{% endblock %}
+{% block content %}
+{% load static %}
+
+<style>
+.option.selected .circle {
+  background-color: #2e6da4;
+  transform: scale(1.1);
+  transition: transform 0.2s;
+}
+
+.report-container {
+  max-width: 500px;
+  margin: 60px auto 0 auto; /* Push down from the top */
+}
+
+.section {
+  margin-bottom: 40px;
+}
+
+.section h3 {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.help-icon {
+  font-size: 1rem;
+  cursor: pointer;
+  color: #555;
+}
+
+.upload-panel, .accessibility-options {
+  background-color: #d3dce3;
+  padding: 15px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.upload-panel p {
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.upload-options, .accessibility-options {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.option, .access-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100px;
+}
+
+.circle {
+  background-color: #0b3558;
+  color: white;
+  font-size: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.option span, .access-card span {
+  font-weight: bold;
+  font-size: 14px;
+  text-align: center;
+}
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 500px;
+  text-align: center;
+  position: relative;
+}
+
+.modal video {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.controls button {
+  margin: 5px;
+  padding: 8px 15px;
+}
+
+#closeModal {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  background: #f00;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.sendreport-footer {
+  margin-top: 60px;
+  padding: 20px 0;
+  background: #0b3558;
+  color: #fff;
+  text-align: center;
+  border-radius: 12px 12px 0 0;
+  font-size: 1rem;
+  letter-spacing: 1px;
+}
+</style>
+<div class="report-container">
+  {% if messages %}
+    <div class="mb-3">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="section">
+    <h3><i class="icon">📝</i> Send a Report <span class="help-icon">❓</span></h3>
+    <div class="upload-panel">
+      <p>You can add multi media files into one report</p>
+      <div class="upload-options">
+        <div class="option" data-type="photo">
+          <div class="circle"><i>🖼️</i></div>
+          <span>Photo</span>
+          <input type="file" accept="image/*" style="display: none;" id="photoInput">
+        </div>
+        <div class="option" data-type="video">
+          <div class="circle"><i>🎥</i></div>
+          <span>Video</span>
+          <input type="file" accept="video/*" style="display: none;" id="videoInput">
+        </div>
+        <div class="option" data-type="audio">
+          <div class="circle"><i>🎙️</i></div>
+          <span>Audio</span>
+          <input type="file" accept="audio/*" style="display: none;" id="audioInput">
+        </div>
+        <div class="option" data-type="link">
+          <div class="circle"><i>🔗</i></div>
+          <span>Link</span>
+          <input type="url" placeholder="Paste your link here" style="display: none;" id="linkInput">
+        </div>
+        <div class="option" data-type="file">
+          <div class="circle"><i>📄</i></div>
+          <span>File</span>
+          <input type="file" style="display: none;" id="fileInput">
+        </div>
+      </div>
+      <form method="POST" enctype="multipart/form-data" id="reportForm">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="mb-3">
+          <label class="form-label">Report type</label>
+          <div class="form-control bg-dark text-white" style="pointer-events:none; opacity:0.8;">
+            Photo, Video, Audio, Link, File
+          </div>
+          <input type="hidden" name="report_type" id="id_report_type" value="{{ form.report_type.value }}">
+          {{ form.report_type.errors }}
+        </div>
+        <div class="mb-3" style="display:none;" id="linkField">
+          {{ form.link.label_tag }}
+          <input type="url" class="form-control bg-dark text-white" name="link" id="id_link" placeholder="Paste your link here" value="{{ form.link.value|default_if_none:'' }}">
+          {{ form.link.errors }}
+        </div>
+        <div class="mb-3">
+          {{ form.description.label_tag }}
+          <textarea class="form-control bg-dark text-white" name="description" id="id_description" rows="3" placeholder="Describe your report">{{ form.description.value|default_if_none:'' }}</textarea>
+          {{ form.description.errors }}
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Report</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3><i class="icon">👥</i> People of Determination</h3>
+    <div class="accessibility-options">
+      <div class="access-card">
+        <div class="circle"><i>📞</i></div>
+        <span>Request a Direct Call</span>
+      </div>
+      <div class="access-card">
+        <div class="circle"><i>🎬</i></div>
+        <span>Record Sign Language</span>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="sendreport-footer">
+  &copy; {{ now|date:'Y' }} Ayer Tena Police Station. All rights reserved.
+</div>
+<!-- Video Modal for Recording -->
+<div id="recordModal" class="modal">
+  <div class="modal-content">
+    <h3>Record Sign Language</h3>
+    <video id="preview" autoplay muted></video>
+    <div class="controls">
+      <button id="startBtn">Start</button>
+      <button id="stopBtn" disabled>Stop</button>
+      <button id="sendBtn" disabled>Send</button>
+    </div>
+    <button id="closeModal">✖</button>
+  </div>
+</div>
+
+<script>
+  // Open hidden file inputs on click
+  document.querySelectorAll('.option').forEach(option => {
+    option.addEventListener('click', () => {
+      const type = option.dataset.type;
+      document.getElementById('linkField').style.display = 'none';
+      const reportTypeMap = {
+        photo: 'photo',
+        video: 'video',
+        audio: 'audio',
+        file: 'file',
+        link: 'link',
+      };
+      if (reportTypeMap[type]) {
+        document.getElementById('id_report_type').value = reportTypeMap[type];
+      }
+      if (type === 'link') {
+        document.getElementById('linkField').style.display = 'block';
+        const link = prompt("Paste your link:");
+        if (link) {
+          document.getElementById('id_link').value = link;
+        }
+      } else {
+        // For file/photo/video/audio, trigger the hidden input in the upload-options
+        const input = option.querySelector('input[type="file"]');
+        if (input) {
+          input.onchange = function() {
+            // Copy the selected file to the Django form's file input
+            const formFileInput = document.getElementById('id_file');
+            if (formFileInput) {
+              formFileInput.files = input.files;
+            } else {
+              // If the form file input doesn't exist, create and append it
+              const newInput = document.createElement('input');
+              newInput.type = 'file';
+              newInput.name = 'file';
+              newInput.id = 'id_file';
+              newInput.style.display = 'none';
+              newInput.files = input.files;
+              document.getElementById('reportForm').appendChild(newInput);
+            }
+          };
+          input.click();
+        }
+      }
+      document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+      option.classList.add('selected');
+    });
+  });
+
+  // Tooltip
+  document.querySelector('.help-icon').addEventListener('click', () => {
+    alert('Attach photos, videos, audio, links or documents to your report.');
+  });
+
+  // Direct call functionality
+  document.querySelectorAll('.access-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const action = card.innerText.trim();
+      if (action.includes('Request a Direct Call')) {
+        window.location.href = "tel:0923531232";
+      }
+      if (action.includes('Record Sign Language')) {
+        openRecordModal();
+      }
+    });
+  });
+
+  // Recording logic
+  let mediaRecorder;
+  let recordedChunks = [];
+  function openRecordModal() {
+    document.getElementById('recordModal').style.display = 'flex';
+    const preview = document.getElementById('preview');
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then(stream => {
+        preview.srcObject = stream;
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = function (e) {
+          if (e.data.size > 0) {
+            recordedChunks.push(e.data);
+          }
+        };
+        mediaRecorder.onstop = function () {
+          preview.srcObject.getTracks().forEach(track => track.stop());
+          const blob = new Blob(recordedChunks, { type: 'video/webm' });
+          const url = URL.createObjectURL(blob);
+          preview.src = url;
+          preview.controls = true;
+          document.getElementById('sendBtn').disabled = false;
+        };
+      })
+      .catch(err => {
+        alert("Could not access camera: " + err);
+        closeModal();
+      });
+  }
+  document.getElementById('startBtn').addEventListener('click', () => {
+    recordedChunks = [];
+    mediaRecorder.start();
+    document.getElementById('startBtn').disabled = true;
+    document.getElementById('stopBtn').disabled = false;
+  });
+  document.getElementById('stopBtn').addEventListener('click', () => {
+    mediaRecorder.stop();
+    document.getElementById('stopBtn').disabled = true;
+  });
+  document.getElementById('sendBtn').addEventListener('click', () => {
+    // Create a Blob from the recorded chunks
+    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+    // Create a File object
+    const file = new File([blob], 'sign_language_video.webm', { type: 'video/webm' });
+    // Set report type to video
+    document.getElementById('id_report_type').value = 'video';
+    // Find or create the hidden file input
+    let formFileInput = document.getElementById('id_file');
+    if (!formFileInput) {
+      formFileInput = document.createElement('input');
+      formFileInput.type = 'file';
+      formFileInput.name = 'file';
+      formFileInput.id = 'id_file';
+      formFileInput.style.display = 'none';
+      document.getElementById('reportForm').appendChild(formFileInput);
+    }
+    // Use DataTransfer to set the file input's files property
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    formFileInput.files = dataTransfer.files;
+    // Submit the form
+    document.getElementById('reportForm').submit();
+    closeModal();
+  });
+  document.getElementById('closeModal').addEventListener('click', closeModal);
+  function closeModal() {
+    document.getElementById('recordModal').style.display = 'none';
+    document.getElementById('startBtn').disabled = false;
+    document.getElementById('stopBtn').disabled = true;
+    document.getElementById('sendBtn').disabled = true;
+    document.getElementById('preview').srcObject = null;
+    document.getElementById('preview').src = '';
+    document.getElementById('preview').removeAttribute('controls');
+  }
+</script>
+{% endblock %}

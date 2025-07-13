@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About | Ayer Tena Police Station{% endblock %}
+
+{% block content %}
+
+<style>
+    body {
+        background-color: #f4f7fc;
+    }
+
+    .section-title {
+        font-size: 36px;
+        font-weight: bold;
+        color: #13357B;
+        margin-bottom: 10px;
+    }
+
+    .section-subtitle {
+        font-size: 18px;
+        color: #555;
+        margin-bottom: 40px;
+    }
+
+    .about-card {
+        transition: all 0.4s ease-in-out;
+        border-radius: 15px;
+        background-color: #fff;
+        padding: 30px 20px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        border: none;
+        position: relative;
+    }
+
+    .about-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .about-card img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #13357B;
+        margin-bottom: 15px;
+    }
+
+    .about-card h4 {
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+
+    .about-card p {
+        font-size: 15px;
+        color: #666;
+    }
+
+    .check-item {
+        font-size: 15px;
+        color: #555;
+        margin-bottom: 10px;
+    }
+
+    .check-item i {
+        color: #13357B;
+        margin-right: 8px;
+    }
+
+    .motto-section {
+        background-color: #fff;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-custom {
+        background-color: #13357B;
+        border-radius: 30px;
+        padding: 12px 35px;
+        font-weight: bold;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: 0.3s;
+    }
+
+    .btn-custom:hover {
+        background-color: #0b2b5c;
+        color: #fff;
+    }
+</style>
+
+<div class="container py-5">
+
+    <div class="text-center mb-5">
+        <h1 class="section-title">About Us</h1>
+        <p class="section-subtitle">Ayer Tena Police Station - Serving with Dedication and Honor</p>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- History -->
+        <div class="col-md-6">
+            <div class="about-card text-center">
+                <img src="{% static 'img/images.jpeg' %}" alt="History">
+                <h4 class="text-primary">Our History</h4>
+                <p>
+                    The Addis Ababa police force has evolved significantly throughout Ethiopia's history. From the early "Yeketema Zebegna" to today's modern Federal Police, Ayer Tena Police Station plays a vital role in maintaining peace, enforcing the law, and safeguarding the community with dedication and integrity.
+                </p>
+            </div>
+        </div>
+
+        <!-- Mission -->
+        <div class="col-md-6">
+            <div class="about-card text-center">
+                <img src="{% static 'img/values.png' %}" alt="Mission">
+                <h4 class="text-primary">Our Mission</h4>
+                <p>
+                    To ensure peace, security, and the rule of law by building a professional police force that prevents crime, protects citizens, and upholds justice.
+                </p>
+            </div>
+        </div>
+
+        <!-- Vision -->
+        <div class="col-md-6">
+            <div class="about-card text-center">
+                <img src="{% static 'img/vision.png' %}" alt="Vision">
+                <h4 class="text-primary">Our Vision</h4>
+                <p>
+                    To become one of Africa's top five police institutions by 2022 E.C., known for professionalism, inclusiveness, and dedication to public service.
+                </p>
+            </div>
+        </div>
+
+        <!-- Values -->
+        <div class="col-md-6">
+            <div class="about-card text-center">
+                <img src="{% static 'img/values.png' %}" alt="Values">
+                <h4 class="text-primary">Our Core Values</h4>
+                <p class="check-item"><i class="fa fa-check"></i> Professionalism</p>
+                <p class="check-item"><i class="fa fa-check"></i> Integrity</p>
+                <p class="check-item"><i class="fa fa-check"></i> Respect for Diversity</p>
+                <p class="check-item"><i class="fa fa-check"></i> Respect for Human Rights</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="text-center mt-5 motto-section">
+        <h4 class="text-primary mb-3">Our Motto</h4>
+        <p class="mb-4"><strong>"Protect With Courage; Serve With Compassion!"</strong></p>
+        <a class="btn btn-custom" href="{% url 'contact' %}">Contact Us</a>
+    </div>
+
+</div>
+
+{% endblock %}

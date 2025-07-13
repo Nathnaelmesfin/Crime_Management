@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% block title %}Home | Ayer Tena Police Station{% endblock %}
+{% block content %}
+{% load static %}
+<style>
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 25px;
+  max-width: 1200px;
+  margin: 80px auto 0 auto; /* Add top margin for spacing */
+}
+.profile-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  transition: 0.3s;
+}
+.profile-card:hover {
+  transform: scale(1.01);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.profile-pic {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+  background: #f3f3f3;
+}
+.profile-info h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: #0b3558;
+}
+.profile-info p {
+  margin: 2px 0;
+  font-size: 14px;
+  color: #333;
+}
+.contact-info {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #0b3558;
+}
+.contact-info p {
+  margin: 5px 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.icon {
+  font-size: 16px;
+}
+.read-btn {
+  margin-top: 10px;
+  background-color: #f0f0f0;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  color: #0b3558;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+.read-btn:hover {
+  background-color: #e0e0e0;
+  color: #1a4a7a;
+}
+.details {
+  display: none;
+  margin-top: 10px;
+  color: #444;
+  font-size: 14px;
+  background: #f7f7f7;
+  border-radius: 8px;
+  padding: 10px;
+}
+.sendreport-footer {
+  margin-top: auto;
+  padding: 20px 0;
+  background: #0b3558;
+  color: #fff;
+  text-align: center;
+  border-radius: 12px 12px 0 0;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  width: 100vw;
+  left: 0;
+  position: fixed;
+  bottom: 0;
+  z-index: 100;
+}
+@media (max-width: 1100px) {
+  .card-container {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 98vw;
+  }
+}
+@media (max-width: 700px) {
+  .card-container {
+    grid-template-columns: 1fr;
+    padding: 0 2vw;
+  }
+  .profile-card {
+    padding: 12px;
+  }
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .profile-pic {
+    width: 48px;
+    height: 48px;
+  }
+  .sendreport-footer {
+    font-size: 0.9rem;
+    padding: 14px 0;
+  }
+}
+</style>
+
+<div class="card-container">
+  {% for person in page_obj %}
+  <div class="profile-card">
+    <div class="profile-header">
+      <img src="{% if person.image %}{{ person.image.url }}{% else %}{% static 'img/logo.jpeg' %}{% endif %}" alt="Profile Photo" class="profile-pic">
+      <div class="profile-info">
+        <h3>{{ person.name }}</h3>
+        <p>Gender: <span>{{ person.get_gender_display|default:person.gender|title }}</span></p>
+        <p>Age: <span>{% if person.age %}{{ person.age }}{% else %}N/A{% endif %}</span></p>
+      </div>
+    </div>
+    <hr>
+    <div class="contact-info">
+      <p><i class="icon">📍</i> Last seen: {{ person.last_seen }}</p>
+      <p><i class="icon">📅</i> Reported: {{ person.date_reported }}</p>
+      <p><i class="icon">📋</i> Status: {{ person.get_status_display }}</p>
+    </div>
+    <button class="read-btn" onclick="toggleDetails(this)">Read More</button>
+    <div class="details">
+      <strong>Details:</strong>
+      {% if person.details|length > 30 %}
+        {{ person.details|slice:":30" }}... <a href="#" class="show-more-link" onclick="showDetailsModal('{{ person.id }}'); return false;">More</a>
+        <div id="details-modal-{{ person.id }}" class="details-modal" style="display:none;">
+          <div class="details-modal-content">
+            <span class="close-modal" onclick="closeDetailsModal('{{ person.id }}')">&times;</span>
+            <h5>Full Details</h5>
+            <div>{{ person.details }}</div>
+          </div>
+        </div>
+      {% else %}
+        {{ person.details }}
+      {% endif %}
+    </div>
+  </div>
+  {% empty %}
+    <p style="text-align:center; color:#888;">No missing persons currently reported.</p>
+  {% endfor %}
+</div>
+<!-- Pagination Controls -->
+{% if page_obj.has_other_pages %}
+<nav aria-label="Missing persons pagination" style="margin: 30px auto 0; text-align:center;">
+  <ul class="pagination" style="display:inline-flex; gap:4px;">
+    {% if page_obj.has_previous %}
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo; Prev</a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">&laquo; Prev</span></li>
+    {% endif %}
+    {% for num in page_obj.paginator.page_range %}
+      {% if page_obj.number == num %}
+        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+      {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+      {% endif %}
+    {% endfor %}
+    {% if page_obj.has_next %}
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next &raquo;</a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Next &raquo;</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+<div class="sendreport-footer">
+  &copy; {{ now|date:'Y' }} Ayer Tena Police Station. All rights reserved.
+</div>
+<script>
+function toggleDetails(btn) {
+  var details = btn.nextElementSibling;
+  if (details.style.display === 'block') {
+    details.style.display = 'none';
+    btn.textContent = 'Read More';
+  } else {
+    details.style.display = 'block';
+    btn.textContent = 'Show Less';
+  }
+}
+function showDetailsModal(id) {
+  var modal = document.getElementById('details-modal-' + id);
+  if (modal) modal.style.display = 'block';
+}
+function closeDetailsModal(id) {
+  var modal = document.getElementById('details-modal-' + id);
+  if (modal) modal.style.display = 'none';
+}
+// Simple modal styling
+var style = document.createElement('style');
+style.innerHTML = `
+.details-modal {
+  position: fixed;
+  z-index: 9999;
+  left: 0; top: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+}
+.details-modal-content {
+  background: #fff;
+  padding: 30px 24px;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90vw;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  position: relative;
+  max-height: 80vh;
+  overflow-y: auto;
+  word-break: break-word;
+}
+.close-modal {
+  position: absolute;
+  top: 10px; right: 18px;
+  font-size: 28px;
+  color: #888;
+  cursor: pointer;
+}
+.show-more-link {
+  color: #0b3558;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 13px;
+}
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

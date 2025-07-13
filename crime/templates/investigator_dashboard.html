@@ -1,0 +1,350 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Officer Panel</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Favicon -->
+    <link href="{% static 'admin/img/favicon.ico' %}" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@500;700&display=swap" rel="stylesheet"> 
+    
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{% static 'admin/css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="{% static 'admin/css/style.css' %}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="container-fluid position-relative d-flex p-0">
+        <!-- Spinner Start -->
+        <div id="spinner" class="show bg-dark position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <!-- Spinner End -->
+
+
+        <!-- Sidebar Start -->
+        <div class="sidebar pe-4 pb-3">
+            <nav class="navbar bg-secondary navbar-dark">
+                <a href="{% url 'investigator_dashboard' %}" class="navbar-brand mx-4 mb-3">
+                    <h3 class="text-primary"><i class="fa fa-shield-alt me-2"></i>Office Panel</h3>
+                </a>
+                <div class="d-flex align-items-center ms-4 mb-4">
+                    <div class="ms-3">
+                        <h6 class="mb-0">{{ user.username }}</h6>
+                        <span>Investigating Officer</span>
+                    </div>
+                </div>
+                 <div class="navbar-nav w-100">
+                    <a href="{% url 'investigator_dashboard' %}" class="nav-item nav-link active"><i
+                            class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+                    <a href="{% url 'Reportadmin' %}" class="nav-item nav-link"><i class="fa fa-file-alt me-2"></i>Report</a>
+                    <a href="{% url 'Reportmissinggoods' %}" class="nav-item nav-link"><i class="fa fa-box-open me-2"></i>Missing Goods</a>
+                    <a href="{% url 'Reportwanted' %}" class="nav-item nav-link"><i class="fa fa-user-secret me-2"></i>Wanted Person</a>
+                </div>
+            </nav>
+        </div>
+        <!-- Sidebar End -->
+
+
+        <!-- Content Start -->
+        <div class="content">
+            <!-- Navbar Start -->
+            <nav class="navbar navbar-expand bg-secondary navbar-dark sticky-top px-4 py-0">
+                <a href="index.html" class="navbar-brand d-flex d-lg-none me-4">
+                    <h2 class="text-primary mb-0"><i class="fa fa-shield-alt"></i></h2>
+                </a>
+                <a href="#" class="sidebar-toggler flex-shrink-0">
+                    <i class="fa fa-bars"></i>
+                </a>
+                <form class="d-none d-md-flex ms-4">
+                    <input class="form-control bg-dark border-0" type="search" placeholder="Search">
+                </form>
+                <div class="navbar-nav align-items-center ms-auto">
+
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link" data-bs-toggle="dropdown">
+                            <i class="fa fa-bell me-lg-2"></i>
+                            {% if unread_count > 0 %}
+                                <span class="badge bg-danger" style="position: absolute; top: 8px; right: 8px;">{{ unread_count }}</span>
+                            {% endif %}
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0" style="min-width: 320px; max-width: 400px;">
+                            {% if notifications %}
+                                {% for n in notifications %}
+                                    <a href="#" class="dropdown-item">
+                                        <h6 class="fw-normal mb-0">{{ n.message }}</h6>
+                                        <small>{{ n.created_at|timesince }} ago{% if not n.is_read %} <span class="badge bg-primary">New</span>{% endif %}</small>
+                                    </a>
+                                    {% if not forloop.last %}<hr class="dropdown-divider">{% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <div class="dropdown-item text-center text-muted">No notifications</div>
+                            {% endif %}
+                            <a href="{% url 'notifications_center' %}" class="dropdown-item text-center">See all notifications</a>
+                        </div>
+                    </div>
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <span class="d-none d-lg-inline-flex">Hello, {{ user.username }}</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0">
+                            <a href="{% url 'admin_logout' %}" class="dropdown-item">Log Out</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <!-- Navbar End -->
+
+
+            <!-- Sale & Revenue Start -->
+            <div class="container-fluid pt-4 px-4">
+                <div class="row g-4">
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
+                            <i class="fa fa-folder-open fa-3x text-primary"></i>
+                            <div class="ms-3">
+                                <p class="mb-2">Total Open Cases</p>
+                                <h6 class="mb-0">{{ total_open }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
+                            <i class="fa fa-search fa-3x text-primary"></i>
+                            <div class="ms-3">
+                                <p class="mb-2">Total Investigating Cases</p>
+                                <h6 class="mb-0">{{ total_investigating }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
+                            <i class="fa fa-lock fa-3x text-primary"></i>
+                            <div class="ms-3">
+                                <p class="mb-2">Total Closed Cases</p>
+                                <h6 class="mb-0">{{ total_closed }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
+                            <i class="fa fa-user-slash fa-3x text-primary"></i>
+                            <div class="ms-3">
+                                <p class="mb-2">Total Missing Persons</p>
+                                <h6 class="mb-0">{{ total_missing }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Sale & Revenue End -->
+
+
+            <!-- Total Cases Chart Start -->
+            <div class="container-fluid pt-4 px-4">
+                <div class="row g-4">
+                    <div class="col-sm-12 col-xl-6">
+                        <div class="bg-secondary text-center rounded p-4">
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                                <h6 class="mb-0">Total Cases by Day</h6>
+                                <a href="">Show All</a>
+                            </div>
+                            <canvas id="cases-by-day" style="width:100%;max-width:100%;height:350px;max-height:350px;"></canvas>
+                            <script id="chart-labels" type="application/json">{{ chart_labels|safe }}</script>
+                            <script id="chart-open" type="application/json">{{ chart_open|safe }}</script>
+                            <script id="chart-investigating" type="application/json">{{ chart_investigating|safe }}</script>
+                            <script id="chart-closed" type="application/json">{{ chart_closed|safe }}</script>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-xl-6">
+                        <div class="bg-secondary text-center rounded p-4">
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                                <h6 class="mb-0">Total Missing by Gender</h6>
+                                <a href="">Show All</a>
+                            </div>
+                            <canvas id="missing-by-gender" style="width:100%;max-width:100%;height:350px;max-height:350px;"></canvas>
+                            <script id="gender-labels" type="application/json">{{ gender_labels|safe }}</script>
+                            <script id="gender-data" type="application/json">{{ gender_data|safe }}</script>
+                            <script>
+                                const genderLabels = JSON.parse(document.getElementById('gender-labels').textContent || '[]');
+                                const genderData = JSON.parse(document.getElementById('gender-data').textContent || '[]');
+                                if (genderLabels.length > 0 && genderData.length > 0) {
+                                    const ctxGender = document.getElementById('missing-by-gender').getContext('2d');
+                                    new Chart(ctxGender, {
+                                        type: 'pie',
+                                        data: {
+                                            labels: genderLabels,
+                                            datasets: [{
+                                                data: genderData,
+                                                backgroundColor: [
+                                                    'rgba(54, 162, 235, 0.7)',
+                                                    'rgba(255, 99, 132, 0.7)',
+                                                    'rgba(255, 206, 86, 0.7)',
+                                                    'rgba(75, 192, 192, 0.7)'
+                                                ],
+                                                borderColor: [
+                                                    'rgba(54, 162, 235, 1)',
+                                                    'rgba(255, 99, 132, 1)',
+                                                    'rgba(255, 206, 86, 1)',
+                                                    'rgba(75, 192, 192, 1)'
+                                                ],
+                                                borderWidth: 1
+                                            }]
+                                        },
+                                        options: {
+                                            responsive: true,
+                                            plugins: {
+                                                legend: { position: 'top' },
+                                                title: { display: true, text: 'Missing Persons by Gender' }
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    document.getElementById('missing-by-gender').parentElement.innerHTML = '<div class="text-white">No data available for chart.</div>';
+                                }
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                // Use json_script for safe JS arrays
+                const chartLabels = JSON.parse(document.getElementById('chart-labels').textContent);
+                const chartOpen = JSON.parse(document.getElementById('chart-open').textContent);
+                const chartInvestigating = JSON.parse(document.getElementById('chart-investigating').textContent);
+                const chartClosed = JSON.parse(document.getElementById('chart-closed').textContent);
+                if (chartLabels.length > 0) {
+                    const ctx = document.getElementById('cases-by-day').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'bar', // changed from 'line' to 'bar'
+                        data: {
+                            labels: chartLabels,
+                            datasets: [
+                                {
+                                    label: 'Open',
+                                    data: chartOpen,
+                                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                    borderWidth: 1,
+                                    stack: 'Open',
+                                },
+                                {
+                                    label: 'Investigating',
+                                    data: chartInvestigating,
+                                    backgroundColor: 'rgba(255, 206, 86, 0.7)',
+                                    borderColor: 'rgba(255, 206, 86, 1)',
+                                    borderWidth: 1,
+                                    stack: 'Investigating',
+                                },
+                                {
+                                    label: 'Closed',
+                                    data: chartClosed,
+                                    backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                                    borderColor: 'rgba(75, 192, 192, 1)',
+                                    borderWidth: 1,
+                                    stack: 'Closed',
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { position: 'top' },
+                                title: { display: true, text: 'Cases by Day' }
+                            },
+                            indexAxis: 'x', // vertical columns
+                            scales: {
+                                x: { title: { display: true, text: 'Date' }, stacked: false },
+                                y: { title: { display: true, text: 'Number of Cases' }, beginAtZero: true, stacked: false }
+                            }
+                        }
+                    });
+                } else {
+                    document.getElementById('cases-by-day').parentElement.innerHTML = '<div class="text-white">No data available for chart.</div>';
+                }
+            </script>
+            <!-- Total Cases Chart End -->
+
+            <!-- Footer Start -->
+            <div class="container-fluid pt-4 px-4">
+                <div class="bg-secondary rounded-top p-4">
+                    <div class="row">
+                        <div class="col-12 col-sm-6 text-center text-sm-start">
+                            &copy; <a href="#">Your Site Name</a>, All Right Reserved. 
+                        </div>
+                        <div class="col-12 col-sm-6 text-center text-sm-end">
+                            <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
+                            Designed By <a href="https://htmlcodex.com">HTML Codex</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Footer End -->
+        </div>
+        <!-- Content End -->
+
+
+        <!-- Back to Top -->
+        <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'admin/lib/chart/chart.min.js' %}"></script>
+    <script src="{% static 'admin/lib/easing/easing.min.js' %}"></script>
+    <script src="{% static 'admin/lib/waypoints/waypoints.min.js' %}"></script>
+    <script src="{% static 'admin/lib/owlcarousel/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'admin/lib/tempusdominus/js/moment.min.js' %}"></script>
+    <script src="{% static 'admin/lib/tempusdominus/js/moment-timezone.min.js' %}"></script>
+    <script src="{% static 'admin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+
+    <!-- Template Javascript -->
+    <script src="{% static 'admin/js/main.js' %}"></script>
+    <script>
+        // Mark notifications as read when dropdown is shown
+        $(document).ready(function() {
+            var unreadCount = Number('{{ unread_count|default:"0" }}');
+            $('.nav-item.dropdown .nav-link').on('click', function() {
+                if (unreadCount > 0) {
+                    $.ajax({
+                        url: '{% url "mark_notifications_read" %}',
+                        type: 'POST',
+                        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                        success: function(data) {
+                            // Optionally, update the badge or UI
+                            $('.badge.bg-danger').remove();
+                            $('.dropdown-item .badge.bg-primary').remove();
+                            unreadCount = 0;
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

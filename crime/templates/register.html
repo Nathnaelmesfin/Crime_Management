@@ -1,0 +1,142 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up</title>
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0B3D6E;  /* Same blue background as your login page */
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 450px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            padding: 40px 30px;
+        }
+        h2 {
+            text-align: center;
+            color: #0B3D6E;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        input:focus, select:focus {
+            border-color: #0B3D6E;
+            outline: none;
+        }
+        .btn-custom {
+            width: 100%;
+            background-color: #0B3D6E;
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            border: none;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .btn-custom:hover {
+            background-color: #0B3D6E;
+            transform: translateY(-2px);
+        }
+        .alert {
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 14px;
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .login-link a {
+            color: #0B3D6E;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Register</h2>
+    <form method="POST" action="">
+        {% csrf_token %}
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        {{ form.non_field_errors }}
+
+        <div class="mb-3">
+            <label>Username:</label>
+            {{ form.username }}
+            {{ form.username.errors }}
+        </div>
+
+        <div class="mb-3">
+            <label>Email:</label>
+            {{ form.email }}
+            {{ form.email.errors }}
+        </div>
+
+        <div class="mb-3">
+            <label>Phone Number:</label>
+            {{ form.phone_number }}
+            {{ form.phone_number.errors }}
+        </div>
+
+        <div class="mb-3">
+            <label>Gender:</label>
+            {{ form.gender }}
+            {{ form.gender.errors }}
+        </div>
+
+        <div class="mb-3">
+            <label>Password:</label>
+            {{ form.password }}
+            {{ form.password.errors }}
+        </div>
+
+        <div class="mb-3">
+            <label>Confirm Password:</label>
+            {{ form.confirm_password }}
+            {{ form.confirm_password.errors }}
+        </div>
+
+        <button type="submit" class="btn btn-custom">Sign Up</button>
+    </form>
+
+    <div class="login-link">
+        Already have an account? <a href="{% url 'login' %}">Login here</a>
+    </div>
+</div>
+
+</body>
+</html>

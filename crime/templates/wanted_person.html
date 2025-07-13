@@ -1,0 +1,299 @@
+{% extends 'base.html' %}
+{% block title %}Home | Ayer Tena Police Station{% endblock %}
+{% block content %}
+{% load static %}
+{% if messages %}
+<div style="max-width:600px;margin:0 auto 20px auto;">
+    {% for message in messages %}
+    <div style="background:#eaf6ff;border-left:4px solid #0b3558;padding:10px 16px;border-radius:8px;margin-bottom:8px;color:#0b3558;">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+<style>
+    .sendreport-footer {
+        margin-top: auto;
+        padding: 20px 0;
+        background: #0b3558;
+        color: #fff;
+        text-align: center;
+        border-radius: 12px 12px 0 0;
+        font-size: 1rem;
+        letter-spacing: 1px;
+        width: 100vw;
+        left: 0;
+        position: fixed;
+        bottom: 0;
+        z-index: 100;
+    }
+
+    .card-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+        max-width: 900px;
+        margin: 40px auto 0 auto;
+    }
+
+    @media (max-width: 900px) {
+        .card-container {
+            grid-template-columns: 1fr;
+            max-width: 98vw;
+        }
+    }
+
+    .profile-card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 16px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        transition: 0.3s;
+        /* Remove scale on hover to prevent overflow issues */
+    }
+
+    .profile-card:hover {
+        /* transform: scale(1.01); */
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .profile-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .profile-pic {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #ccc;
+    }
+
+    .profile-info h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .profile-info p {
+        margin: 2px 0;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .contact-info {
+        margin-top: 10px;
+        font-size: 14px;
+        color: #0b3558;
+    }
+
+    .contact-info p {
+        margin: 5px 0;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .icon {
+        font-size: 16px;
+    }
+
+    .read-btn {
+        margin-top: 10px;
+        background-color: #f0f0f0;
+        border: none;
+        padding: 10px 16px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .read-btn:hover {
+        background-color: #e0e0e0;
+    }
+
+    .details-modal {
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(3px);
+        display: none;
+        /* Always hidden by default, shown via JS */
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        pointer-events: auto;
+    }
+
+    .details-modal[style*="display: flex"] {
+        display: flex !important;
+    }
+
+    .details-modal-content {
+        background: #fff;
+        padding: 30px 24px;
+        border-radius: 12px;
+        max-width: 400px;
+        width: 90vw;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+        position: fixed;
+        left: 50vw;
+        top: 50vh;
+        transform: translate(-50%, -50%);
+        max-height: 80vh;
+        overflow-y: auto;
+        word-break: break-word;
+        display: block;
+        pointer-events: auto;
+    }
+
+    @media (max-width: 500px) {
+        .details-modal-content {
+            padding: 16px 6vw;
+            max-width: 98vw;
+            width: 98vw;
+            max-height: 80vh;
+        }
+    }
+</style>
+<div class="container-fluid bg-light service py-5">
+    <div class="container py-5">
+        <div class="card-container">
+            {% for person in page_obj %}
+            <div class="profile-card">
+                <div class="profile-header">
+                    <img src="{% if person.image %}{{ person.image.url }}{% else %}{% static 'img/logo.jpeg' %}{% endif %}"
+                        alt="Profile Photo" class="profile-pic">
+                    <div class="profile-info">
+                        <h3>{{ person.name }}</h3>
+                        <p>Crime: <span>{{ person.crime }}</span></p>
+                        <p>Status: <span>{{ person.get_status_display }}</span></p>
+                        {% if person.reward %}
+                        <p>Reward: <span>{{ person.reward }}</span></p>
+                        {% endif %}
+                    </div>
+                </div>
+                <hr>
+                <div class="contact-info">
+                    <p><i class="icon">📞</i> Phone: 991</p>
+                    <p><i class="icon">✉️</i> Email: Ethiopiafederalpolice@gmail.com</p>
+                </div>
+                <button class="read-btn show-details-btn" data-person-id="{{ person.id }}">Read More</button>
+        <button class="read-btn show-tip-btn" data-person-id="{{ person.id }}" style="margin-left:10px;background:#eaf6ff;">Submit Tip</button>
+        <div id="details-modal-{{ person.id }}" class="details-modal" style="display:none;">
+            <div class="details-modal-content">
+                <span class="close-modal" data-person-id="{{ person.id }}">&times;</span>
+                <h5>Details</h5>
+                <div style="white-space: pre-wrap; word-break: break-word;">{{ person.details }}</div>
+            </div>
+        </div>
+        <div id="tip-modal-{{ person.id }}" class="details-modal" style="display:none;">
+            <div class="details-modal-content">
+                <span class="close-tip-modal" data-person-id="{{ person.id }}">&times;</span>
+                <h5>Submit a Tip</h5>
+                <form method="post" action="" style="margin-top:10px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="wanted_person_id" value="{{ person.id }}">
+                    <textarea name="tip_text" rows="4" style="width:100%;border-radius:8px;padding:8px;resize:vertical;" placeholder="Enter your tip here..." required></textarea>
+                    <div style="margin:10px 0 16px 0;">
+                        <label style="font-size:14px;cursor:pointer;">
+                            <input type="checkbox" name="is_anonymous" style="margin-right:6px;">Submit as anonymous
+                        </label>
+                    </div>
+                    <button type="submit" name="tip_submit" class="read-btn" style="background:#0b3558;color:#fff;">Send Tip</button>
+                </form>
+            </div>
+        </div>
+            </div>
+            {% empty %}
+            <p style="text-align:center; color:#888;">No wanted persons currently listed.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination Controls -->
+        {% if page_obj.has_other_pages %}
+        <nav aria-label="Wanted persons pagination" style="margin: 30px auto 0; text-align:center;">
+            <ul class="pagination" style="display:inline-flex; gap:4px;">
+                {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;
+                        Prev</a></li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">&laquo; Prev</span></li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <li class="page-item"><a
+                        class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next
+                            &raquo;</a></li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">Next &raquo;</span></li>
+                    {% endif %}
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endif %}
+<div class="sendreport-footer">
+    &copy; {{ now|date:'Y' }} Ayer Tena Police Station. All rights reserved.
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.show-details-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var id = btn.getAttribute('data-person-id');
+                var modal = document.getElementById('details-modal-' + id);
+                if (modal) modal.style.display = 'flex';
+            });
+        });
+        document.querySelectorAll('.close-modal').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var id = btn.getAttribute('data-person-id');
+                var modal = document.getElementById('details-modal-' + id);
+                if (modal) modal.style.display = 'none';
+            });
+        });
+        document.querySelectorAll('.show-tip-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var id = btn.getAttribute('data-person-id');
+                var modal = document.getElementById('tip-modal-' + id);
+                if (modal) modal.style.display = 'flex';
+            });
+        });
+        document.querySelectorAll('.close-tip-modal').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var id = btn.getAttribute('data-person-id');
+                var modal = document.getElementById('tip-modal-' + id);
+                if (modal) modal.style.display = 'none';
+            });
+        });
+        document.querySelectorAll('.details-modal').forEach(function (modal) {
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) modal.style.display = 'none';
+            });
+        });
+    });
+    {% if messages %}
+    <div style="max-width:600px;margin:0 auto 20px auto;">
+        {% for message in messages %}
+        <div style="background:#eaf6ff;border-left:4px solid #0b3558;padding:10px 16px;border-radius:8px;margin-bottom:8px;color:#0b3558;">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</script>
+
+{% endblock %}
