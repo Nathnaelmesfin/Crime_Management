@@ -1,7 +1,18 @@
 from django.db import models
-from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+import uuid
+
+
+class BaseModel(models.Model):
+    """Abstract base model that provides UUID id and timestamps."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
 
 class MissingGoods(models.Model):
     STATUS_CHOICES = [
@@ -58,6 +69,8 @@ class CrimeCase(models.Model):
     STATUS_CHOICES = [
         ('open', 'Open'),
         ('investigating', 'Under Investigation'),
+        ('fast_solved', 'Fast Solved'),
+        ('sent_to_court', 'Sent To Court'),
         ('closed', 'Closed'),
     ]
     case_id = models.CharField(max_length=100, unique=True)
@@ -140,6 +153,61 @@ class PublicCrimeReport(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     submitted_by = models.CharField(max_length=100)
     submitted_at = models.DateTimeField(auto_now_add=True)
+
+
+class TemporaryDetention(BaseModel):
+    """Record for short term custody of a detainee."""
+
+    detainee_name = models.CharField(max_length=200)
+    nationality = models.CharField(max_length=100, blank=True)
+    phone = models.CharField(max_length=20, blank=True)
+    emergency_phone = models.CharField(max_length=20, blank=True)
+    released_at = models.DateTimeField(null=True, blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    crime_case = models.ForeignKey(CrimeCase, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self) -> str:
+        return f"{self.detainee_name} - {self.created_at.date()}"
+
+    @property
+    def overdue(self) -> bool:
+        if self.released_at:
+            return False
+        from django.utils import timezone
+        return timezone.now() - self.created_at > timezone.timedelta(hours=24)
+
+
+class DetaineeItem(BaseModel):
+    """Items recorded with a detainee."""
+
+    ROUTE_CHOICES = [
+        ("EXHIBIT", "Exhibit"),
+        ("STORE", "Store Room"),
+    ]
+
+    detention = models.ForeignKey(TemporaryDetention, related_name="items", on_delete=models.CASCADE)
+    description = models.CharField(max_length=255)
+    suspected_link = models.BooleanField(default=False)
+    route = models.CharField(max_length=10, choices=ROUTE_CHOICES, editable=False)
+    logged_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+
+    def save(self, *args, **kwargs):
+        self.route = "EXHIBIT" if self.suspected_link else "STORE"
+        super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"{self.description} ({self.route})"
+
+
+class FastSolvedCase(BaseModel):
+    """Marks a crime case resolved without court process."""
+
+    crime_case = models.OneToOneField(CrimeCase, on_delete=models.CASCADE)
+    resolution_note = models.TextField()
+    resolved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self) -> str:
+        return f"Fast solved case {self.crime_case.case_id}"
 
 class Notification(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

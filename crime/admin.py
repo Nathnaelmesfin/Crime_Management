@@ -1,7 +1,8 @@
 from django.contrib import admin
 from .models import (
     UserCustom, CrimeCase, EvidenceFile, Announcement, WantedPerson, Tip, MissingPerson, MissingPersonReport,
-    PublicCrimeReport, Notification, AnonymousTip, Complaint, CaseSuggestion, News, Report, MissingGoods
+    PublicCrimeReport, Notification, AnonymousTip, Complaint, CaseSuggestion,
+    News, Report, MissingGoods, TemporaryDetention, DetaineeItem, FastSolvedCase
 )
 
 admin.site.register(UserCustom)
@@ -20,3 +21,6 @@ admin.site.register(Complaint)
 admin.site.register(CaseSuggestion)
 admin.site.register(News)
 admin.site.register(Report)
+admin.site.register(TemporaryDetention)
+admin.site.register(DetaineeItem)
+admin.site.register(FastSolvedCase)
